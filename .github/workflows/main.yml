@@ -1,48 +1,25 @@
-name: Slack Notification
+name: 'Build, Push, Deploy and Notify'
 'on':
-  - push
+  push:
+    branches:
+      - main
+    env:
+      SLACK_WEBHOOK_URL: '${{ secrets.SLACK_WEBHOOK_URL }}'
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Notify Slack - Build Started
-        if: always()
-        env:
-          SLACK_WEBHOOK_URL: '${{ secrets.SLACK_WEBHOOK_URL }}'
-        run: >
-          curl -X POST -H 'Content-type: application/json' --data
-          '{"text":"Build started!"}' $SLACK_WEBHOOK_URL
       - uses: actions/checkout@v2
+      - name: Notify slack on build start
+        if: always()
+        uses: voxmedia/github-action-slack-notify-build@v1
+        with:
+          channel: your-slack-channel
+          status: STARTED
+          color: good
       - name: Build Docker image
         run: docker build -t test_image .
       - name: Login to Docker Hub
         run: >-
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{
           secrets.DOCKER_ACCESS_TOKEN }}
-      - name: Notify Slack - Build Completed
-        if: always()
-        env:
-          SLACK_WEBHOOK_URL: '${{ secrets.SLACK_WEBHOOK_URL }}'
-        run: >
-          curl -X POST -H 'Content-type: application/json' --data
-          '{"text":"Build completed!"}' $SLACK_WEBHOOK_URL
-      - name: Send custom JSON data to Slack workflow
-        id: slack
-        uses: slackapi/slack-github-action@v1.25.0
-        with: null
-        payload: |
-          {
-            "text": "GitHub Action build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
-            "blocks": [
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "GitHub Action build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
-                }
-              }
-            ]
-          }
-    env:
-      SLACK_WEBHOOK_URL: '${{ secrets.SLACK_WEBHOOK_URL }}'
-      SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
