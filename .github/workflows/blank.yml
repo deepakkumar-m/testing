@@ -21,14 +21,18 @@ jobs:
 
       - name: Notify on Slack - Success
         if: success()
-        uses: slack/webhook-action@v2
+        uses: 8398a7/action-slack@v3
         with:
-          url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          payload: '{"text": "Build, Push, and Deploy succeeded"}'
+          status: 'success'
+          text: 'Build, Push, and Deploy succeeded'
+          fields: repo,message,commit,author,action,eventName,workflow,job,took
+          author_name: 'GitHub Actions'
 
       - name: Notify on Slack - Failure
         if: failure()
-        uses: slack/webhook-action@v2
+        uses: 8398a7/action-slack@v3
         with:
-          url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          payload: '{"text": "Build, Push, or Deploy failed"}'
+          status: 'failure'
+          text: 'Build, Push, or Deploy failed'
+          fields: repo,message,commit,author,action,eventName,workflow,job,took
+          author_name: 'GitHub Actions'
