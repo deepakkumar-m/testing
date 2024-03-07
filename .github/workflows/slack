@@ -10,9 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Notify on Slack - Build Started
-        run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"Build started"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"Build started"}' ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: Build Docker image
         run: docker build -t test_image .
@@ -20,10 +21,10 @@ jobs:
       - name: Login to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_ACCESS_TOKEN }}
 
-    - name: Slack Notification
-      uses: act10ns/slack@v1
-      with: 
-        status: ${{ job.status }}
-        channel: '#general'
-        message:  Build and login Successfully
-      if: always()   
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        with: 
+          status: ${{ job.status }}
+          text: Build and login Successfully
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
