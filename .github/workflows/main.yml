@@ -1,46 +1,17 @@
-name: Slack Notification
+name: Build, Push, Deploy and Notify
 
 on:
   push:
     branches:
-      - main # Adjust this to your main branch name
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Notify Slack - Build Started
-        if: always()
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          JOB_STATUS: ${{ job.status }}
-          JOB_ID: ${{ github.run_id }}
-        
- 		
-        run: |
-          curl -X POST -H 'Content-type: application/json' --data '{
-              "blocks": [
-                  {
-                      "type": "section",
-                      "text": {
-                          "type": "mrkdwn",
-                          "text": "*Build Started*"
-                      }
-                  },
-                  {
-                      "type": "section",
-                      "fields": [
-                          {
-                              "type": "mrkdwn",
-                              "text": "*Status:*\n$JOB_STATUS"
-                          },
-                          {
-                              "type": "mrkdwn",
-                              "text": "*Job ID:*\n$JOB_ID"
-                          }
-                      ]
-                  }
-              ]
-          }' "$SLACK_WEBHOOK_URL"
-        
+      - uses: actions/checkout@v2
+      - name: Build Docker image
+        run: docker build -t test_image .
+
+      - name: Login to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_ACCESS_TOKEN }}
