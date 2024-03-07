@@ -7,8 +7,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run build
+        run: |
+          # Your build commands here
+          # For example, if you're using npm:
+          npm install
+          npm run build
+
       - name: Send Slack notification
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: ${{ success() }}
         run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"This is a test notification"}' $SLACK_WEBHOOK_URL
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"Build succeeded!"}' $SLACK_WEBHOOK_URL
+
+      - name: Send Slack notification on failure
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: ${{ failure() }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"Build failed!"}' $SLACK_WEBHOOK_URL
