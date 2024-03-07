@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          node-version: '20'
-
       - name: Build Docker image
-        run: |
-          docker build -t test_image
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker push IMAGE_NAME
+        run: docker build -t test_image .
+      
+      - name: Login to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Push Docker image
+        run: docker push test_image
