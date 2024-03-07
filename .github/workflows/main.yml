@@ -19,6 +19,3 @@ jobs:
       - name: Notify on Slack - Success
         if: success()
         uses: rtCamp/action-slack-notify@v2
-        with:
-          status: 'success'
-          text: 'Build, Push, and Deploy succeeded'
