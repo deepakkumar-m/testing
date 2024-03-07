@@ -1,4 +1,5 @@
-name: Build, Push, Deploy and Notify
+slack_message: |
+  Build, Push, Deploy and Notify workflow completed successfully!
 
 on:
   push:
@@ -19,3 +20,6 @@ jobs:
       - name: Notify on Slack - Success
         if: success()
         uses: rtCamp/action-slack-notify@v2
+        with:
+          status: ${{ job.status }}
+          text: ${{ completed }}
