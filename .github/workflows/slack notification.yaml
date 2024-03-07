@@ -1,0 +1,22 @@
+name: Slack Notification
+
+on:
+  push:
+    branches:
+      - main  # Change this to the branch you want to trigger the action on
+
+jobs:
+  slack_notification:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        with:
+          status: ${{ job.status }}
+          text: |
+            The workflow *${{ github.workflow }}* has been triggered!
+            Commit message: *${{ github.event.head_commit.message }}*
+            Committer: *${{ github.event.head_commit.committer.name }}*
+            Workflow run ID: *${{ github.run_id }}*
+          slack_webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
