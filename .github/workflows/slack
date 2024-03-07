@@ -16,20 +16,10 @@ jobs:
       - name: Login to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_ACCESS_TOKEN }}
 
-      - name: Notify on Slack - Success
-        if: success()
-        uses: act10ns/slack@v1
-        with:
-          status: 'success'
-          text: 'Build, Push, and Deploy succeeded'
-          fields: repo,message,commit,author,action,eventName,workflow,job,took
-          author_name: 'GitHub Actions'
-
-      - name: Notify on Slack - Failure
-        if: failure()
-        uses: act10ns/slack@v1
-        with:
-          status: 'failure'
-          text: 'Build, Push, or Deploy failed'
-          fields: repo,message,commit,author,action,eventName,workflow,job,took
-          author_name: 'GitHub Actions'
+    - name: Slack Notification
+      uses: act10ns/slack@v1
+      with: 
+        status: ${{ job.status }}
+        channel: '#test'
+        message:  Build and login Successfully
+      if: always()   
