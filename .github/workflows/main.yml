@@ -3,8 +3,6 @@ name: 'Build, Push, Deploy and Notify'
   push:
     branches:
       - main
-    env:
-      SLACK_WEBHOOK_URL: '${{ secrets.SLACK_WEBHOOK_URL }}'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,9 +10,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: Notify slack on build start
         if: always()
+        env:
+          SLACK_WEBHOOK_URL: '${{ secrets.SLACK_WEBHOOK_URL }}'
         uses: voxmedia/github-action-slack-notify-build@v1
         with:
-          channel: your-slack-channel
+          channel: deepakgitaction-test
           status: STARTED
           color: good
       - name: Build Docker image
