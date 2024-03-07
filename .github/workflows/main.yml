@@ -22,5 +22,3 @@ jobs:
         with:
           status: 'success'
           text: 'Build, Push, and Deploy succeeded'
-          fields: repo,message,commit,author,action,eventName,workflow,job,took
-          author_name: 'GitHub Actions'
