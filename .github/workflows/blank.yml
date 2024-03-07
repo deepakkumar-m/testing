@@ -15,6 +15,6 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t IMAGE_NAME .
+          docker build -t test_image
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker push IMAGE_NAME
