@@ -7,8 +7,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Send Slack notification
+      - name: Notify Slack - Build Started
+        if: always()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"This is a test notification"}' $SLACK_WEBHOOK_URL
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"Build started!"}' $SLACK_WEBHOOK_URL
+
+      - uses: actions/checkout@v2
+
+      - name: Build Docker image
+        run: docker build -t test_image .
+
+      - name: Login to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
+      - name: Notify Slack - Build Completed
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"Build completed!"}' $SLACK_WEBHOOK_URL
