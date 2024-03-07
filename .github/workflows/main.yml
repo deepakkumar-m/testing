@@ -1,25 +1,30 @@
-name: 'Build, Push, Deploy and Notify'
-'on':
+name: Slack Notification
+
+on:
   push:
     branches:
-      - main
+      - main # Adjust this to your main branch name
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Notify slack on build start
+      - name: Notify Slack - Build Started
         if: always()
         env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_NOTIFICATIONS_BOT_TOKEN }}
-        uses: voxmedia/github-action-slack-notify-build@v1
-        with:
-          channel: deepakgitaction-test
-          status: STARTED
-          color: good
-      - name: Build Docker image
-        run: docker build -t test_image .
-      - name: Login to Docker Hub
-        run: >-
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{
-          secrets.DOCKER_ACCESS_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{
+              "blocks": [
+                  {
+                      "type": "image",
+                      "title": {
+                          "type": "plain_text",
+                          "text": "Build Started!"
+                      },
+                      "image_url": "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif",
+                      "alt_text": "Build Started Animation"
+                  }
+              ]
+          }' "$SLACK_WEBHOOK_URL"
