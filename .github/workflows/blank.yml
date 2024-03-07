@@ -21,14 +21,14 @@ jobs:
 
       - name: Notify on Slack - Success
         if: success()
-        uses: slack/webhook-action@v2
+        uses: docker://slack/webhook-action:v2
         with:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           payload: '{"text": "Build, Push, and Deploy succeeded"}'
 
       - name: Notify on Slack - Failure
         if: failure()
-        uses: slack/webhook-action@v2
+        uses: docker://slack/webhook-action:v2
         with:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           payload: '{"text": "Build, Push, or Deploy failed"}'
