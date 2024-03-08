@@ -27,12 +27,3 @@ jobs:
           slack_username: GitHub Actions
           slack_message: "Docker image built and pushed to Docker Hub successfully!"
           slack_color: good
-
-      - name: Slack notification on failure
-        if: failure()
-        uses: rtCamp/action-slack-notify@v2
-        with:
-          slack_webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-          slack_username: GitHub Actions
-          slack_message: "Docker image build and push to Docker Hub failed. Check the workflow for details."
-          slack_color: danger
