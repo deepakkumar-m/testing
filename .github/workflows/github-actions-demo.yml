@@ -17,6 +17,7 @@ jobs:
 
       - name: Slack notification
         uses: voxmedia/github-action-slack-notify-build@v1
+        with: deepakgitaction-test
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_USERNAME: GitHub Actions
