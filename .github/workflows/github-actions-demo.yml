@@ -15,11 +15,23 @@ jobs:
       - name: Login to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_ACCESS_TOKEN }}
 
-      - name: Slack notification
-        uses: rtCamp/action-slack-notify@v2.2.1
+      - name: Push Docker image
+        run: docker push <your-docker-image>
 
+      - name: Slack notification on success
+        if: success()
+        uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_USERNAME: GitHub Actions
           SLACK_MESSAGE: "Docker image built and pushed to Docker Hub successfully!"
           SLACK_COLOR: good
+
+      - name: Slack notification on failure
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_USERNAME: GitHub Actions
+          SLACK_MESSAGE: "Docker image build and push to Docker Hub failed. Check the workflow for details."
+          SLACK_COLOR: danger
