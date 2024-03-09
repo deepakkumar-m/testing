@@ -1,37 +1,37 @@
 name: Build and Publish to Registry
 
-on:
-  push
+on: [push]
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-  GKE_CLUSTER: testing
-  GKE_REGION: us-central1
-  DEPLOYMENT_NAME: gke-test
+  GKE_CLUSTER: testing # Add your cluster name here.
+  GKE_REGION: us-east1 # Add your cluster zone here.
+  DEPLOYMENT_NAME: gke-test # Add your deployment name here.
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
 jobs:
   setup-build-publish-deploy:
-    name: Setup, Build, and Publish
+    name: Setup, Build and Publish
     runs-on: ubuntu-latest
     environment: dev
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
 
-      - name: Setup gcloud CLI
-        uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
-        with:
-          service_account_key: ${{ secrets.GKE_SA_KEY }}
-          project_id: ${{ secrets.GKE_PROJECT }}
+    - name: Notify Slack
+      env:
+        SLACK_MESSAGE: "Starting the build and publish process"
+      run: |
+        curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"${SLACK_MESSAGE}\"}" ${{ secrets.SLACK_WEBHOOK_URL }}
 
-      - name: Configure Docker authentication
-        run: gcloud --quiet auth configure-docker
-        
-      - name: Get GKE credentials
-        uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
-        with:
-          cluster_name: ${{ env.GKE_CLUSTER }}
-          location: ${{ env.GKE_REGION }}
-          credentials: ${{ secrets.GKE_SA_KEY }}
+    # Setup gcloud CLI
+    - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
+      with:
+        project_id: ${{ secrets.GKE_PROJECT }}
+
+    - name: Notify Slack
+      env:
+        SLACK_MESSAGE: "Configured Docker to use gcloud command-line tool"
+      run: |
+        curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"${SLACK_MESSAGE}\"}" ${{ secrets.SLACK_WEBHOOK_URL }}
