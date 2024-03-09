@@ -28,10 +28,40 @@ jobs:
       run: |
         # Your build and push commands here
 
-    - name: Slack notification on success
-      if: success()
-      uses: Ilshidur/action-slack@2.0.2
+       # Send a Slack notification with a custom payload
+    - name: Slack Notification
       env:
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
-      with:
-        payload: '{"text": "Custom message without ref"}'
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      run: |
+        curl -X POST -H 'Content-type: application/json' --data '{
+          "attachments": [
+            {
+              "fallback": "Build and Publish to Registry job completed successfully.",
+              "color": "good",
+              "pretext": "Build and Publish to Registry",
+              "fields": [
+                {
+                  "title": "Status",
+                  "value": "Success",
+                  "short": true
+                },
+                {
+                  "title": "Project ID",
+                  "value": "'${{ env.PROJECT_ID }}'",
+                  "short": true
+                },
+                {
+                  "title": "Cluster",
+                  "value": "'${{ env.GKE_CLUSTER }}'",
+                  "short": true
+                },
+                {
+                  "title": "Region",
+                  "value": "'${{ env.GKE_REGION }}'",
+                  "short": true
+                }
+              ]
+            }
+          ]
+        }' $SLACK_WEBHOOK_URL
+
