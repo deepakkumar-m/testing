@@ -34,7 +34,7 @@ jobs:
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
         SLACK_USERNAME: GitHub Actions
-        SLACK_MESSAGE: "Docker image built and pushed to Docker Hub successfully!"
+        SLACK_MESSAGE: "Docker image built and pushed to Docker Hub successfully! Branch: ${{ github.ref }}"
         SLACK_COLOR: good
 
     - name: Slack notification on failure
@@ -43,5 +43,5 @@ jobs:
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
         SLACK_USERNAME: GitHub Actions
-        SLACK_MESSAGE: "Docker image build and push to Docker Hub failed. Check the workflow for details."
+        SLACK_MESSAGE: "Docker image built and pushed to Docker Hub successfully! Branch: ${{ github.ref }}"
         SLACK_COLOR: danger
