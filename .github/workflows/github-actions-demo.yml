@@ -1,3 +1,23 @@
+name: Build and Publish to Registry
+
+on: [push]
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: testing # Add your cluster name here.
+  GKE_REGION: us-east1 # Add your cluster zone here.
+  DEPLOYMENT_NAME: gke-test # Add your deployment name here.
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+jobs:
+  setup-build-publish-deploy:
+    name: Setup, Build and Publish
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
     - name: Setup gcloud CLI
       uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
       with:
