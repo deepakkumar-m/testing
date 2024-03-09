@@ -1,67 +1,129 @@
-name: Build and Publish to Registry
-
-on: [push]
-
-env:
-  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-  GKE_CLUSTER: testing # Add your cluster name here.
-  GKE_REGION: us-east1 # Add your cluster zone here.
-  DEPLOYMENT_NAME: gke-test # Add your deployment name here.
-  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-jobs:
-  setup-build-publish-deploy:
-    name: Setup, Build and Publish
-    runs-on: ubuntu-latest
-    environment: dev
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    # Setup gcloud CLI
-    - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
+    - name: Setup gcloud CLI
+      uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
       with:
+        service_account_key: ${{ secrets.GKE_SA_KEY }}
         project_id: ${{ secrets.GKE_PROJECT }}
+      # Send a Slack notification for Setup gcloud CLI step
+      - name: Slack Notification - Setup gcloud CLI
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{
+            "attachments": [
+              {
+                "fallback": "Setup gcloud CLI step completed successfully.",
+                "color": "good",
+                "pretext": "Setup gcloud CLI",
+                "fields": [
+                  {
+                    "title": "Status",
+                    "value": "Success",
+                    "short": true
+                  }
+                ]
+              }
+            ]
+          }' $SLACK_WEBHOOK_URL
 
-    - name: Build and Push Docker Image
+    - name: Configure Docker
       run: |
-        # Your build and push commands here
+        gcloud --quiet auth configure-docker
+      # Send a Slack notification for Configure Docker step
+      - name: Slack Notification - Configure Docker
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{
+            "attachments": [
+              {
+                "fallback": "Configure Docker step completed successfully.",
+                "color": "good",
+                "pretext": "Configure Docker",
+                "fields": [
+                  {
+                    "title": "Status",
+                    "value": "Success",
+                    "short": true
+                  }
+                ]
+              }
+            ]
+          }' $SLACK_WEBHOOK_URL
 
-       # Send a Slack notification with a custom payload
-    - name: Slack Notification
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    - name: Build image
       run: |
-        curl -X POST -H 'Content-type: application/json' --data '{
-          "attachments": [
-            {
-              "fallback": "Build and Publish to Registry job completed successfully.",
-              "color": "good",
-              "pretext": "Build and Publish to Registry",
-              "fields": [
-                {
-                  "title": "Status",
-                  "value": "Success",
-                  "short": true
-                },
-                {
-                  "title": "Project ID",
-                  "value": "'${{ env.PROJECT_ID }}'",
-                  "short": true
-                },
-                {
-                  "title": "Cluster",
-                  "value": "'${{ env.GKE_CLUSTER }}'",
-                  "short": true
-                },
-                {
-                  "title": "Region",
-                  "value": "'${{ env.GKE_REGION }}'",
-                  "short": true
-                }
-              ]
-            }
-          ]
-        }' $SLACK_WEBHOOK_URL
+        # Your build commands here
+      # Send a Slack notification for Build image step
+      - name: Slack Notification - Build image
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{
+            "attachments": [
+              {
+                "fallback": "Build image step completed successfully.",
+                "color": "good",
+                "pretext": "Build image",
+                "fields": [
+                  {
+                    "title": "Status",
+                    "value": "Success",
+                    "short": true
+                  }
+                ]
+              }
+            ]
+          }' $SLACK_WEBHOOK_URL
 
+    - name: Publish image
+      run: |
+        # Your publish commands here
+      # Send a Slack notification for Publish image step
+      - name: Slack Notification - Publish image
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{
+            "attachments": [
+              {
+                "fallback": "Publish image step completed successfully.",
+                "color": "good",
+                "pretext": "Publish image",
+                "fields": [
+                  {
+                    "title": "Status",
+                    "value": "Success",
+                    "short": true
+                  }
+                ]
+              }
+            ]
+          }' $SLACK_WEBHOOK_URL
+
+    - name: Setup kubectl
+      uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
+      with:
+        cluster_name: ${{ env.GKE_CLUSTER }}
+        location: ${{ env.GKE_REGION }}
+        credentials: ${{ secrets.GKE_SA_KEY }}
+      # Send a Slack notification for Setup kubectl step
+      - name: Slack Notification - Setup kubectl
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{
+            "attachments": [
+              {
+                "fallback": "Setup kubectl step completed successfully.",
+                "color": "good",
+                "pretext": "Setup kubectl",
+                "fields": [
+                  {
+                    "title": "Status",
+                    "value": "Success",
+                    "short": true
+                  }
+                ]
+              }
+            ]
+          }' $SLACK_WEBHOOK_URL
