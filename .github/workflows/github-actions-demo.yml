@@ -30,9 +30,8 @@ jobs:
 
     - name: Slack notification on success
       if: success()
-      uses: rtCamp/action-slack-notify@v2
+      uses: slack/webhook-action@v2
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
-        SLACK_USERNAME: GitHub Actions
-        SLACK_MESSAGE: "Docker image built and pushed to Docker Hub successfully! Branch: ${{ github.event.ref }} Custom Message: Your custom message here"
-        SLACK_COLOR: good
+      with:
+        payload: '{"text": "Custom message without ref"}'
