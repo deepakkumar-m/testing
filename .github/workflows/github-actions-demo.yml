@@ -4,10 +4,9 @@ on: [push]
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-  GKE_CLUSTER: shukra-dashboard # Add your cluster name here.
+  GKE_CLUSTER: testing # Add your cluster name here.
   GKE_REGION: us-east1 # Add your cluster zone here.
   DEPLOYMENT_NAME: gke-test # Add your deployment name here.
-  IMAGE: shukra-frontend
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
 jobs:
@@ -20,19 +19,29 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Notify Slack
-      uses: rtCamp/action-slack-notify@v2.2.1
-      with:
-        slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
-        message: "Starting the build and publish process"
-
     # Setup gcloud CLI
     - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
       with:
         project_id: ${{ secrets.GKE_PROJECT }}
 
-    - name: Notify Slack
-      uses: rtCamp/action-slack-notify@v2.2.1
-      with:
-        slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
-        message: "Configured Docker to use gcloud command-line tool"
+    - name: Build and Push Docker Image
+      run: |
+        # Your build and push commands here
+
+    - name: Slack notification on success
+      if: success()
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+        SLACK_USERNAME: GitHub Actions
+        SLACK_MESSAGE: "Docker image built and pushed to Docker Hub successfully!"
+        SLACK_COLOR: good
+
+    - name: Slack notification on failure
+      if: failure()
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+        SLACK_USERNAME: GitHub Actions
+        SLACK_MESSAGE: "Docker image build and push to Docker Hub failed. Check the workflow for details."
+        SLACK_COLOR: danger
