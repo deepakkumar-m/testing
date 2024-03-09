@@ -30,7 +30,7 @@ jobs:
 
     - name: Slack notification on success
       if: success()
-      uses: slack/webhook-action@v2
+      uses: act10ns/slack@v1
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
       with:
