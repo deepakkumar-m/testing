@@ -10,7 +10,7 @@ env:
 
 jobs:
   setup-build-publish-deploy:
-    name: Setup, Build and Publish
+    name: Setup, Build, and Publish
     runs-on: ubuntu-latest
     environment: dev
 
@@ -26,49 +26,39 @@ jobs:
           service_account_key: ${{ secrets.GKE_SA_KEY }}
           project_id: ${{ secrets.GKE_PROJECT }}
 
-      # Notify Slack on setup success
-      - name: Notify Slack on setup success
-        if: ${{ success() }}
+      # Notify Slack on setup success or failure
+      - name: Notify Slack on setup
+        if: ${{ always() }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
           payload: |
             {
-              "text": "Step 1 - Setup gcloud CLI succeeded."
+              "text": "Step 1 - Setup gcloud CLI",
+              "attachments": [
+                {
+                  "color": "${{ job.status }}",
+                  "text": "${{ job.status }}: Setup gcloud CLI ${{ job.status == 'success' ? 'succeeded' : 'failed' }}"
+                }
+              ]
             }
 
-      # Notify Slack on setup failure
-      - name: Notify Slack on setup failure
-        if: ${{ failure() }}
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          payload: |
-            {
-              "text": "Step 1 - Setup gcloud CLI failed."
-            }
-
-      # Configure Docker to use the gcloud command-line tool as a credential
-      # helper for authentication
+      # Configure Docker to use the gcloud command-line tool as a credential helper for authentication
       - name: Configure Docker
         run: |-
-          gcloud -quiet auth configure-docker
+          gcloud --quiet auth configure-docker
 
-      # Notify Slack on Docker configuration success
-      - name: Notify Slack on Docker configuration success
-        if: ${{ success() }}
+      # Notify Slack on Docker configuration success or failure
+      - name: Notify Slack on Docker configuration
+        if: ${{ always() }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
           payload: |
             {
-              "text": "Step 2 - Configure Docker to use the gcloud command-line tool as a credential was succeeded."
-            }
-
-      # Notify Slack on Docker configuration failure
-      - name: Notify Slack on Docker configuration failure
-        if: ${{ failure() }}
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          payload: |
-            {
-                  "color": "danger",
-                  "text": "Step 2 - Configure Docker to use the gcloud command-line tool as a credential was failed."
+              "text": "Step 2 - Configure Docker",
+              "attachments": [
+                {
+                  "color": "${{ job.status }}",
+                  "text": "${{ job.status }}: Configure Docker ${{ job.status == 'success' ? 'succeeded' : 'failed' }}"
                 }
+              ]
+            }
