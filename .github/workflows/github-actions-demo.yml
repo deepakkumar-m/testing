@@ -50,7 +50,7 @@ jobs:
       # helper for authentication
       - name: Configure Docker
         run: |-
-          gcloud --quiet auth configure-docker
+          gcloud -quiet auth configure-docker
 
       # Notify Slack on Docker configuration success
       - name: Notify Slack on Docker configuration success
