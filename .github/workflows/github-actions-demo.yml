@@ -33,7 +33,7 @@ jobs:
         with:
           payload: |
             {
-              "text": "Step 1 - Setup gcloud CLI succeeded."
+              "text": "Step 1 - Setup gcloud CLI succeeded ✅."
             }
 
       # Notify Slack on setup failure
@@ -43,7 +43,7 @@ jobs:
         with:
           payload: |
             {
-              "text": "Step 1 - Setup gcloud CLI failed."
+              "text": "Step 1 - Setup gcloud CLI failed ❌."
             }
 
       # Configure Docker to use the gcloud command-line tool as a credential
@@ -59,7 +59,7 @@ jobs:
         with:
           payload: |
             {
-              "text": "Step 2 - Configure Docker to use the gcloud command-line tool as a credential was succeeded."
+              "text": "Step 2 - Configure Docker to use the gcloud command-line tool as a credential was succeeded ✅."
             }
 
       # Notify Slack on Docker configuration failure
@@ -69,5 +69,5 @@ jobs:
         with:
           payload: |
             {
-              "text": "Step 2 - Configure Docker to use the gcloud command-line tool as a credential was failed❌."
+              "text": "Step 2 - Configure Docker to use the gcloud command-line tool as a credential was failed ❌."
             }
