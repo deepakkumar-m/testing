@@ -46,14 +46,13 @@ jobs:
               "text": "Step 1 - Setup gcloud CLI failed."
             }
 
-
-      # Configure Docker to use the gcloud command-line tool as a credential
-      # helper for authentication
-      - run: |-
+      # Configure Docker to use the gcloud command-line tool as a credential helper for authentication
+      - name: Configure Docker
+        run: |-
           gcloud --quiet auth configure-docker
-		  
-      # Notify Slack on setup success
-      - name: Notify Slack on setup success
+
+      # Notify Slack on Docker configuration success
+      - name: Notify Slack on Docker configuration success
         if: ${{ success() }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
@@ -62,8 +61,8 @@ jobs:
               "text": "Step 2 - Configure Docker to use the gcloud command-line tool as a credential was success."
             }
 
-      # Notify Slack on setup failure
-      - name: Notify Slack on setup failure
+      # Notify Slack on Docker configuration failure
+      - name: Notify Slack on Docker configuration failure
         if: ${{ failure() }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
