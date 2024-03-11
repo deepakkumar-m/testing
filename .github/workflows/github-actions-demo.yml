@@ -72,5 +72,3 @@ jobs:
                   "color": "danger",
                   "text": "Step 2 - Configure Docker to use the gcloud command-line tool as a credential was failed."
                 }
-              ]
-            }
