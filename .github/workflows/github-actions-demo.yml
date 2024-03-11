@@ -33,7 +33,7 @@ jobs:
         with:
           payload: |
             {
-              "text": "Setup gcloud CLI succeeded."
+              "text": "Step 1 - Setup gcloud CLI succeeded."
             }
 
       # Notify Slack on setup failure
@@ -43,7 +43,7 @@ jobs:
         with:
           payload: |
             {
-              "text": "Setup gcloud CLI failed."
+              "text": "Step 1 - Setup gcloud CLI failed."
             }
 
 
