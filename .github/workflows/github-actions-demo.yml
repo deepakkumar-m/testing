@@ -6,6 +6,7 @@ env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   GKE_CLUSTER: testing    # Add your cluster name here.
   DEPLOYMENT_NAME: gke-test # Add your deployment name here.
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
 jobs:
   setup-build-publish-deploy:
@@ -18,22 +19,35 @@ jobs:
         uses: actions/checkout@v3
 
       # Setup gcloud CLI
-      - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
+      - name: Setup gcloud CLI
+        id: setup_gcloud
+        uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
         with:
           service_account_key: ${{ secrets.GKE_SA_KEY }}
           project_id: ${{ secrets.GKE_PROJECT }}
+
+      # Notify Slack on setup success
+      - name: Notify Slack on setup success
+        if: ${{ success() }}
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "Setup gcloud CLI succeeded."
+            }
+
+      # Notify Slack on setup failure
+      - name: Notify Slack on setup failure
+        if: ${{ failure() }}
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "Setup gcloud CLI failed."
+            }
+
 
       # Configure Docker to use the gcloud command-line tool as a credential
       # helper for authentication
       - run: |-
           gcloud --quiet auth configure-docker
-
-      - name: Notify Slack
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          payload: |
-            {
-              "text": "Git push done in the repo, demogithubactionyttest"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
