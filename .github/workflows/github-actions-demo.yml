@@ -46,9 +46,10 @@ jobs:
               "text": "Step 1 - Setup gcloud CLI failed."
             }
 
-      # Configure Docker to use the gcloud command-line tool as a credential helper for authentication
-      - name: Configure Docker
-        run: |-
+
+      # Configure Docker to use the gcloud command-line tool as a credential
+      # helper for authentication
+      - run: |-
           gcloud --quiet auth configure-docker
 		  
       # Notify Slack on setup success
