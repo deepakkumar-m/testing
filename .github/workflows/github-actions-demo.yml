@@ -4,11 +4,9 @@ on: [push]
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-  GKE_CLUSTER: testing
-  GKE_REGION: us-central1	 # Add your cluster zone here.
+  GKE_CLUSTER: testing    # Add your cluster name here.
   DEPLOYMENT_NAME: gke-test # Add your deployment name here.
-  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  
+
 jobs:
   setup-build-publish-deploy:
     name: Setup, Build and Publish
@@ -16,45 +14,26 @@ jobs:
     environment: dev
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Notify slack starting
-      if: always()
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      uses: voxmedia/github-action-slack-notify-build@v1
-      with:
-        channel: deepakgitaction-test
-        status: STARTING
-        color: warning
+      # Setup gcloud CLI
+      - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
+        with:
+          service_account_key: ${{ secrets.GKE_SA_KEY }}
+          project_id: ${{ secrets.GKE_PROJECT }}
 
-    - name: Setup gcloud CLI
-      uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
-      with:
-        service_account_key: ${{ secrets.GKE_SA_KEY }}
-        project_id: ${{ secrets.GKE_PROJECT }}
+      # Configure Docker to use the gcloud command-line tool as a credential
+      # helper for authentication
+      - run: |-
+          gcloud --quiet auth configure-docker
 
-    - name: Notify slack gcloud setup
-      if: always()
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      uses: voxmedia/github-action-slack-notify-build@v1
-      with:
-        channel: deepakgitaction-test
-        status: GCLOUD_SETUP
-        color: good
-
-    - name: Configure Docker to use the gcloud command-line tool as a credential
-      run: |
-        gcloud --quiet auth configure-docker
-
-    - name: Notify slack docker auth
-      if: always()
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      uses: voxmedia/github-action-slack-notify-build@v1
-      with:
-        channel: deepakgitaction-test
-        status: DOCKER_AUTH
-        color: good
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "Git push done in the repo, demogithubactionyttest"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
