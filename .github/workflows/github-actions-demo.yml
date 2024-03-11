@@ -26,6 +26,7 @@ jobs:
         with:
           service_account_key: ${{ secrets.GKE_SA_KEY }}
           project_id: ${{ secrets.GKE_PROJECT }}
+
         # Add Slack notification for success and failure
         run: |
           gcloud config list
@@ -33,16 +34,4 @@ jobs:
             curl -X POST -H 'Content-type: application/json' --data '{"text":"Setup gcloud CLI step completed successfully"}' $SLACK_WEBHOOK_URL
           else
             curl -X POST -H 'Content-type: application/json' --data '{"text":"Setup gcloud CLI step failed"}' $SLACK_WEBHOOK_URL
-          fi
-
-      # Configure Docker to use the gcloud command-line tool as a credential
-      - name: Configure Docker
-        run: |-
-          gcloud --quiet auth configure-docker
-        # Add Slack notification for success and failure
-        run: |
-          if [ $? -eq 0 ]; then
-            curl -X POST -H 'Content-type: application/json' --data '{"text":"Configured Docker successfully"}' $SLACK_WEBHOOK_URL
-          else
-            curl -X POST -H 'Content-type: application/json' --data '{"text":"Configured Docker failed"}' $SLACK_WEBHOOK_URL
           fi
