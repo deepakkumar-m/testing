@@ -36,8 +36,8 @@ jobs:
               "text": "Step 1 - Setup gcloud CLI",
               "attachments": [
                 {
-                  "color": "${{ job.status }}",
-                  "text": "${{ job.status }}: Setup gcloud CLI ${{ job.status == 'success' ? 'succeeded' : 'failed' }}"
+                  "color": "${{ job.status == 'success' && 'good' || 'danger' }}",
+                  "text": "${{ job.status == 'success' && '✅' || '❌' }} Setup gcloud CLI ${{ job.status == 'success' && 'succeeded' || 'failed' }}"
                 }
               ]
             }
@@ -57,8 +57,8 @@ jobs:
               "text": "Step 2 - Configure Docker",
               "attachments": [
                 {
-                  "color": "${{ job.status }}",
-                  "text": "${{ job.status }}: Configure Docker ${{ job.status == 'success' ? 'succeeded' : 'failed' }}"
+                  "color": "${{ job.status == 'success' && 'good' || 'danger' }}",
+                  "text": "${{ job.status == 'success' && '✅' || '❌' }} Configure Docker ${{ job.status == 'success' && 'succeeded' || 'failed' }}"
                 }
               ]
             }
