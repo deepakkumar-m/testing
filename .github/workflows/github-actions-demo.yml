@@ -14,11 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
 
-jobs:
-  setup-build-publish-deploy:
-    name: Setup, Build and Publish
-    runs-on: one-thd-gcp #one-thd-gcp  #one-thd-gcp-np  #one-thd-onprem-np
-    environment: dev
+
     steps:
       - name: Notify Slack
         uses: rtCamp/action-slack-notify@v2
