@@ -33,15 +33,14 @@ jobs:
               ]
             }
 
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    # Setup gcloud CLI
-    - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
-      with:
-        service_account_key: ${{ secrets.GKE_SA_KEY }}
-        project_id: ${{ secrets.GKE_PROJECT }}
+      # Setup gcloud CLI
+      - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
+        with:
+          service_account_key: ${{ secrets.GKE_SA_KEY }}
+          project_id: ${{ secrets.GKE_PROJECT }}
 
       # Notify Slack on setup success
       - name: Notify Slack on setup success
@@ -63,10 +62,9 @@ jobs:
               "text": "Step 1 - Setup gcloud CLI failed ❌."
             }
 
-    # Configure Docker to use the gcloud command-line tool as a credential
-    # helper for authentication
-    - run: |-
-        gcloud --quiet auth configure-docker
+      # Configure Docker to use the gcloud command-line tool as a credential helper for authentication
+      - run: |-
+          gcloud --quiet auth configure-docker
 
       # Notify Slack on Docker configuration success
       - name: Notify Slack on Docker configuration success
@@ -87,21 +85,21 @@ jobs:
             {
               "text": "Step 2 - Configure Docker to use the gcloud command-line tool as a credential was failed ❌."
             }
-            
-    # Get the GKE credentials so we can deploy to the cluster
-    - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
-      with:
-        cluster_name: ${{ env.GKE_CLUSTER }}
-        location: ${{ env.GKE_REGION }}
-        credentials: ${{ secrets.GKE_SA_KEY }}
 
-    # Build image 
-    - name: Build image
-      run: |-
-       docker build . -t "us.gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA" -f Dockerfile
+      # Get the GKE credentials so we can deploy to the cluster
+      - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_REGION }}
+          credentials: ${{ secrets.GKE_SA_KEY }}
+
+      # Build image 
+      - name: Build image
+        run: |-
+          docker build . -t "us.gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA" -f Dockerfile
        
-      # Notify Slack on Docker configuration success
-      - name: Notify Slack on Docker configuration success
+      # Notify Slack on Build image success
+      - name: Notify Slack on Build image success
         if: ${{ success() }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
@@ -110,8 +108,8 @@ jobs:
               "text": "Step 3 - Build image was succeeded ✅."
             }
 
-      # Notify Slack on Docker configuration failure
-      - name: Notify Slack on Docker configuration failure
+      # Notify Slack on Build image failure
+      - name: Notify Slack on Build image failure
         if: ${{ failure() }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
@@ -120,13 +118,13 @@ jobs:
               "text": "Step 3 - Build image was failed ❌."
             }
  
-    # Publish image 
-    - name: Publish image
-      run: |-
-       docker push "us.gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
+      # Publish image 
+      - name: Publish image
+        run: |-
+          docker push "us.gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
        
-      # Notify Slack on Docker configuration success
-      - name: Notify Slack on Docker configuration success
+      # Notify Slack on Publish image success
+      - name: Notify Slack on Publish image success
         if: ${{ success() }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
@@ -135,8 +133,8 @@ jobs:
               "text": "Step 4 - Publish image was succeeded ✅."
             }
 
-      # Notify Slack on Docker configuration failure
-      - name: Notify Slack on Docker configuration failure
+      # Notify Slack on Publish image failure
+      - name: Notify Slack on Publish image failure
         if: ${{ failure() }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
@@ -145,15 +143,13 @@ jobs:
               "text": "Step 4 - Publish image was failed ❌."
             }
 
-
-    # Automated CD stages added from here -- Added this line for testing
-    # setup kubectl
-    - name: setup kubectl
-      run: |-
-        gcloud components install kubectl
+      # Setup kubectl
+      - name: Setup kubectl
+        run: |-
+          gcloud components install kubectl
         
-      # Notify Slack on Docker configuration success
-      - name: Notify Slack on Docker configuration success
+      # Notify Slack on Setup kubectl success
+      - name: Notify Slack on Setup kubectl success
         if: ${{ success() }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
@@ -162,8 +158,8 @@ jobs:
               "text": "Step 5 - Setup kubectl was succeeded ✅."
             }
 
-      # Notify Slack on Docker configuration failure
-      - name: Notify Slack on Docker configuration failure
+      # Notify Slack on Setup kubectl failure
+      - name: Notify Slack on Setup kubectl failure
         if: ${{ failure() }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
@@ -171,61 +167,52 @@ jobs:
             {
               "text": "Step 5 - Setup kubectl was failed ❌."
             }
-    
-    # setup gke-gcloud-auth-plugin
-    - name: Setup gke-gcloud-auth-plugin
-      run: |-
-        gcloud components install gke-gcloud-auth-plugin
-     
-    # Get GKE Credentials        
-    - name: Get GKE Credentials
-      run: |-
-        gcloud container clusters get-credentials "$GKE_CLUSTER" --region "$GKE_REGION" 
-    
-    # Set up kustomize
-    - name: Set up Kustomize
-      run: |-
-        curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
-        chmod u+x ./kustomize
-         
-      # Notify Slack on Docker configuration success
-      - name: Notify Slack on Docker configuration success
+
+      # Setup gke-gcloud-auth-plugin
+      - name: Setup gke-gcloud-auth-plugin
+        run: |-
+          gcloud components install gke-gcloud-auth-plugin
+
+      # Get GKE Credentials
+      - name: Get GKE Credentials
+        run: |-
+          gcloud container clusters get-credentials "$GKE_CLUSTER" --region "$GKE_REGION"
+
+      # Set up Kustomize
+      - name: Set up Kustomize
+        run: |-
+          curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
+          chmod u+x ./kustomize
+
+      # Notify Slack on Setup Kustomize success
+      - name: Notify Slack on Setup Kustomize success
         if: ${{ success() }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
           payload: |
             {
-              "text": "Step 6 - Setup kustomize was succeeded ✅."
+              "text": "Step 6 - Setup Kustomize was succeeded ✅."
             }
 
-      # Notify Slack on Docker configuration failure
-      - name: Notify Slack on Docker configuration failure
+      # Notify Slack on Setup Kustomize failure
+      - name: Notify Slack on Setup Kustomize failure
         if: ${{ failure() }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
           payload: |
             {
               "text": "Step 6 - Setup Kustomize was failed ❌."
-            }         
-    # Deploy the Docker image to the GKE cluster
-    - name: Deploy to dev
-      run: |-
-        ./kustomize edit set image us.gcr.io/PROJECT_ID/IMAGE:GITHUB_SHA=us.gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA
-        ./kustomize build . | kubectl apply -f - -n dev
-        #kubectl set image deployment/shukra-backend shukra-backend-container="us.gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA" -n dev
-        #pwd
-        #echo $PATH
-        #set
-        #ls -lrth
-        #ls -lrth deployment-shukra-backend-dev-new.yaml
-        #kubectl apply -f SapHanaShukra_backend_Dev/deployment-shukra-backend-dev-new.yaml -n dev
-        #kubectl rollout status deployment/$DEPLOYMENT_NAME -n dev
-        kubectl get services -o wide -n dev
-        
+            }
 
+      # Deploy the Docker image to the GKE cluster
+      - name: Deploy to dev
+        run: |-
+          ./kustomize edit set image us.gcr.io/PROJECT_ID/IMAGE:GITHUB_SHA=us.gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA
+          ./kustomize build . | kubectl apply -f - -n dev
+          kubectl get services -o wide -n dev
 
-      # Notify Slack on Docker configuration success
-      - name: Notify Slack on Docker configuration success
+      # Notify Slack on Deploy to dev success
+      - name: Notify Slack on Deploy to dev success
         if: ${{ success() }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
@@ -234,8 +221,8 @@ jobs:
               "text": "Step 7 - Deploy the Docker image to the GKE cluster was succeeded ✅."
             }
 
-      # Notify Slack on Docker configuration failure
-      - name: Notify Slack on Docker configuration failure
+      # Notify Slack on Deploy to dev failure
+      - name: Notify Slack on Deploy to dev failure
         if: ${{ failure() }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
